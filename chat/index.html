@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat</title>
+    <script>
+        var websocket;
+
+        function connect() {
+            var token = document.getElementById("token").value;
+            websocket = new WebSocket("ws://127.0.0.1:8000/ws/" + token);
+
+            websocket.onmessage = function(event) {
+                var messages = document.getElementById("messages");
+                var message = JSON.parse(event.data);
+                var newMessage = document.createElement("div");
+                newMessage.appendChild(document.createTextNode(message.username + ": " + message.text));
+                messages.appendChild(newMessage);
+            };
+
+            websocket.onerror = function(event) {
+                console.error("WebSocket error observed:", event);
+            };
+        }
+
+        function sendMessage() {
+            var input = document.getElementById("messageText");
+            websocket.send(input.value);
+            input.value = '';
+        }
+    </script>
+</head>
+<body>
+    <h1>WebSocket Chat</h1>
+    <input type="text" id="token" placeholder="Enter token here">
+    <button onclick="connect()">Connect</button>
+    <div id="messages" style="border:1px solid #ccc; height:200px; overflow:auto; margin-bottom:10px;"></div>
+    <input type="text" id="messageText" placeholder="Enter message here">
+    <button onclick="sendMessage()">Send</button>
+</body>
+</html>
